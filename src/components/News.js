@@ -3,6 +3,8 @@ import NewsItem from './NewsItem'
 import Spinner from './Spinner';
 import PropTypes from 'prop-types'
 import InfiniteScroll from "react-infinite-scroll-component";
+
+
 export class News extends Component {
   static defaultProps={
      country:'in',
@@ -31,17 +33,21 @@ export class News extends Component {
   }
   async updateNews()
   {
-    let url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=b85984b361ca4178ab9ed1a0dc2d1485&page=${this.state.page}&pageSize=${this.props.pageSize}`
+    this.props.setProgress(10)
+    let url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apikey}&page=${this.state.page}&pageSize=${this.props.pageSize}`
     let data=await fetch(url)
+    this.props.setProgress(30)
     let parsedData=await data.json()
+    this.props.setProgress(70)
     this.setState({articles:parsedData.articles, totalResults:parsedData.totalResults, loading:false})
+    this.props.setProgress(100)
   }
   async componentDidMount(){
     this.updateNews()
   }
 fetchMoreData = async() => {
     this.setState({page:this.state.page+1})
-    let url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=b85984b361ca4178ab9ed1a0dc2d1485&page=${this.state.page}&pageSize=${this.props.pageSize}`
+    let url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apikey}&page=${this.state.page+1}&pageSize=${this.props.pageSize}`
     let data=await fetch(url)
     let parsedData=await data.json()
     this.setState({articles:this.state.articles.concat(parsedData.articles), totalResults:parsedData.totalResults, loading:false})
@@ -50,7 +56,7 @@ fetchMoreData = async() => {
   render() {
     return (
     <>
-        <h1 className='text-center' style={{margin:'35px'}}>NewsMonkey - Top {this.capitalizeFirstLetter(this.props.category)} Headlines</h1>
+        <h1 className='text-center' style={{margin:'35px',marginTop:'90px'}}>NewsMonkey - Top {this.capitalizeFirstLetter(this.props.category)} Headlines</h1>
         {this.state.loading&&<Spinner/>}
         <InfiniteScroll
           dataLength={this.state.articles.length}
